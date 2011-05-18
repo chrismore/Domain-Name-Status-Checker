@@ -44,8 +44,9 @@ for address in $input; do
 	response=$(curl --write-out %{http_code} --silent --output /dev/null $pro://$address)        
 
 	#Determine a human readable status code message
-	if [ $response == "200" ] || [ $response == "206" ]; then
+	if [ $response == "200" ] || [ $response == "226" ]; then
 		status="Ok"
+		check_html_url="$pro://$address"
 		(( total_ok++ ))
 	elif [ $response == "404" ]; then
 		status="Error: $response Not Found"
@@ -55,13 +56,22 @@ for address in $input; do
 		(( total_error++ ))
 	elif [ $response == "301" ] || [ $response == "302" ]; then
 		# Check to see if a website is just redirecting from http to https
-		website=$(curl --write-out %{redirect_url} --silent --output /dev/null $pro://$address)
-		if [ "https://$address/" == "$website" ]; then
-			status="Ok"
-			pro="https"
-			(( total_ok++ ))
+		website_redirected=$(curl --write-out %{redirect_url} --silent --output /dev/null $pro://$address)
+		if [ "https://$address/" == "$website_redirected" ]; then
+			# Check redirector again incase it redirects a second time (localization)
+			website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
+			if [ "$website_redirected2" == "" ]; then
+				status="Ok"
+				check_html_url=$website_redirected
+				(( total_ok++ ))
+			else
+				status="Ok"
+				check_html_url=$website_redirected2
+				(( total_ok++ ))
+			fi
+			
 		else
-			status="Redirected: $website"
+			status="Redirected: $website_redirected"
 			(( total_redirect++ ))
 		fi
 	elif [ $response == "000" ]; then
@@ -82,7 +92,7 @@ for address in $input; do
 
 	if [ "$status" == "Ok" ]; then
 		#Only check if the website is not redirecting or erroring out
-		webtrends_check=$(curl --silent $pro://$address | grep -i webtrends | wc -m | sed 's/ //g')
+		webtrends_check=$(curl --silent $check_html_url | grep -i webtrends | wc -m | sed 's/ //g')
 
 		if [ "$webtrends_check" == "0" ]; then
 			webtrends="No"
