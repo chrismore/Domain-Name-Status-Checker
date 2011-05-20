@@ -67,13 +67,16 @@ for address in $input; do
 		# Check to see if a website is just redirecting from http to https
 		website_redirected=$(curl --write-out %{redirect_url} --silent --output /dev/null $pro://$address)
 		if [ "https://$address/" == "$website_redirected" ]; then
+			pro="https"
 			# Check redirector again incase it redirects a second time (localization)
 			website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
 			if [ "$website_redirected2" == "" ]; then
+				#If the website did not redirect again after switching to https, then set check_html_url to current address.
 				status="Ok"
 				check_html_url=$website_redirected
 				(( total_ok++ ))
 			else
+				#If the website redirected a second time, set the check_html_url variable to the second redirected address.
 				status="Ok"
 				check_html_url=$website_redirected2
 				(( total_ok++ ))
