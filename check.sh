@@ -11,7 +11,9 @@ exec `sort -f -o $inputfile $inputfile`
 output="output.txt"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
-
+create_active_websites_wiki=1
+websites_output="active-websites.txt"
+ignore_domain="allizom.org"
 #####
 
 total_websites=0
@@ -21,6 +23,10 @@ total_error=0
 total_redirect=0
 total_ftp=0
 today=`date +%m-%d-%Y`
+
+if [ $create_active_websites_wiki == 1 ]; then
+	exec `cat /dev/null > $websites_output`
+fi
 
 input=`cat $inputfile`
 
@@ -111,13 +117,17 @@ for address in $input; do
 		else
 			analytics="Yes"
 			(( total_analytics++ ))
-			if [ $check_analytics_coverage == 1 ]; then
+			if [ $check_analytics_coverage == 1 ] && [ "$check_html_url" == "${check_html_url/$ignore_domain/}" ]; then
 				#Spider every page on the website to determine the % of pages with analytics
 				echo "Spidering $address..."
 				coverage=`./find-analytics.sh $check_html_url $analytics_string`
 			else
 				coverage="N/A"
 			fi
+		fi
+		
+		if [ $create_active_websites_wiki == 1 ]; then
+			exec `./active-websites.sh $check_html_url $websites_output > /dev/null`
 		fi
 	else
 		analytics="N/A"
