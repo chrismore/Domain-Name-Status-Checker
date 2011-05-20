@@ -2,19 +2,25 @@
 
 # This script takes a text input list of domains and checks their status
 # The output of the script are wiki bullets
+# Author: Chris More
+
+## Settings ##
 
 inputfile="input.txt"
-exec `sort -f -o=$inputfile $inputfile`
+exec `sort -f -o $inputfile $inputfile`
 output="output.txt"
+analytics_string="webtrendslive.com"
+check_analytics_coverage=1
+
+#####
+
 total_websites=0
-total_webtrends=0
+total_analytics=0
 total_ok=0
 total_error=0
 total_redirect=0
 total_ftp=0
 today=`date +%m-%d-%Y`
-
-#######
 
 input=`cat $inputfile`
 
@@ -24,9 +30,12 @@ echo "The following list and updates is as of $today
 	|-
 	! scope='col' | Web Address
 	! scope='col' | Status
-	! scope='col' | WebTrends Installed" > $output
+	! scope='col' | Analytics Installed
+	! scope='col' | Analytics Page Coverage" > $output
 
 for address in $input; do
+
+	coverage=0
 
 	echo "|-" >> $output 
 
@@ -88,25 +97,32 @@ for address in $input; do
 		(( total_error++ ))
 	fi
 
-	#Check to see if the website has WebTrends code installed
+	#Check to see if the website has analytics code installed
 
-	if [ "$status" == "Ok" ]; then
+	if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 		#Only check if the website is not redirecting or erroring out
-		webtrends_check=$(curl --silent $check_html_url | grep -i webtrends | wc -m | sed 's/ //g')
+		analytics_check=$(curl --silent $check_html_url | grep -i $analytics_string | wc -m | sed 's/ //g')
 
-		if [ "$webtrends_check" == "0" ]; then
-			webtrends="No"
+		if [ "$analytics_check" == "0" ]; then
+			analytics="No"
 		else
-			webtrends="Yes"
-			(( total_webtrends++ ))
+			analytics="Yes"
+			(( total_analytics++ ))
+			if [ $coverage != 0 ]
+				#Spider every page on the website to determine the % of pages with analytics
+				echo "Spidering $address..."
+				coverage=`./find-analytics.sh $check_html_url $analytics_string`
+			else
+				coverage="N/A"
+			fi
 		fi
 	else
-		webtrends="N/A"
-		webtrends_check=0
+		analytics="N/A"
+		analytics_check=0
 	fi
 
-	echo "$address, $response, $webtrends ($webtrends_check)"
-	echo "| [$pro://$address $address] || $status || $webtrends" >> $output
+	echo "$address, $response, $analytics ($analytics_check)"
+	echo "| [$pro://$address $address] || $status || $analytics || $coverage%" >> $output
 done
 
 echo "|}
@@ -118,6 +134,6 @@ echo "|}
 * Total Ok: $total_ok
 * Total Errors: $total_error
 * Total Redirects: $total_redirect
-* Total WebTrends: $total_webtrends
+* Total Analytics Installed: $total_analytics
 
 The source script for this page can be found at [https://github.com/chrismore/Domain-Name-Status-Checker here]." >> $output
