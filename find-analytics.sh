@@ -10,7 +10,7 @@ analytics_string=$2
 exec `rm -rf web > /dev/null`
 exec `rm -rf hts* > /dev/null`
 # Spider every page, which requires HTTrack + libssl.so installed
-exec `httrack "$domain" -w -%e0 -T5 -p1 -N3 -Q -%x -I0 -F "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" > /dev/null`
+exec `httrack "$domain" -w -%e0 -T5 -p3 -N3 -Q -%x -I0 -A9999999999 -s2 -%c10 -c5 --delayed-type-check=0 -F "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" > /dev/null`
 # Grep for the number of pages that include the analytics string - stop at first occourance of string in file
 finds=`find ./web -name "*.html" | xargs grep -sicl $analytics_string | wc -l | sed 's/ //g'`
 # Find how many HTML pages have been spidered
