@@ -111,7 +111,7 @@ for address in $input; do
 		else
 			analytics="Yes"
 			(( total_analytics++ ))
-			if [ $coverage != 0 ]
+			if [ $coverage != 0 ]; then
 				#Spider every page on the website to determine the % of pages with analytics
 				echo "Spidering $address..."
 				coverage=`./find-analytics.sh $check_html_url $analytics_string`
