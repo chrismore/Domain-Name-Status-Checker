@@ -13,7 +13,7 @@ analytics_string="webtrendslive.com"
 check_analytics_coverage=1
 create_active_websites_wiki=1
 websites_output="active-websites.txt"
-ignore_domain="allizom.org"
+ignore_domain="addons"
 #####
 
 total_websites=0
@@ -114,6 +114,7 @@ for address in $input; do
 
 		if [ "$analytics_check" == "0" ]; then
 			analytics="No"
+			coverage="N/A"
 		else
 			analytics="Yes"
 			(( total_analytics++ ))
@@ -122,6 +123,9 @@ for address in $input; do
 				echo "Spidering $address..."
 				coverage=`./find-analytics.sh $check_html_url $analytics_string`
 			else
+				coverage="N/A"
+			fi
+			if [ coverage == 0 ]; then
 				coverage="N/A"
 			fi
 		fi
@@ -142,7 +146,7 @@ echo "|}
 
 == Statistics ==
 
-* Total Websites: $total_websites
+* Total Websites: [[Domain Names/all|$total_websites]]
 * Total FTP servers: $total_ftp
 * Total Ok: $total_ok
 * Total Errors: $total_error
