@@ -8,12 +8,8 @@ websites_output="active-websites.txt"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
 create_active_websites_wiki=1
+concurrent_procs=10
 
-if [ $create_active_websites_wiki == 1 ]; then
-	exec `cat /dev/null > $websites_output`
-fi
-
-coverage=0
 #determine if this is a website or ftp server
 
 if echo "$address" | grep -i '^ftp'; then
@@ -53,10 +49,31 @@ elif [ $response == "301" ] || [ $response == "302" ]; then
 			status_type="ok"
 			check_html_url=$website_redirected2
 		fi
-		
 	else
-		status="Redirected: $website_redirected"
-		status_type="redirect"
+		# website stayed http
+		domain=`echo $website_redirected | sed -E "s/^(.+\/\/)([^/]+)(.*)/\2/"`
+		if [[ "$domain" == "$address" ]]; then
+			# website redirected, but stayed on the same domain. Probably l10n redirection.
+			
+			website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
+			
+			if [ "$website_redirected2" == "" ]; then
+				# website did not redirect to a subdirectory.
+				status="Ok"
+				status_type="ok"
+				check_html_url=$website_redirected
+			else
+				#If the website redirected a second time, set the check_html_url variable to the second redirected address.
+				status="Ok"
+				status_type="ok"
+				check_html_url=$website_redirected2
+			fi
+			
+		else
+			# website redirected to aother domain.
+			status="Redirected: $website_redirected"
+			status_type="redirect"
+		fi		
 	fi
 elif [ $response == "000" ]; then
 	status="Error: Unable to connect"
@@ -75,15 +92,30 @@ fi
 #Check to see if the website has analytics code installed
 
 if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
+
 	#Only check if the website is not redirecting or erroring out
 	analytics_check=$(curl --silent $check_html_url | grep -i $analytics_string | wc -m | sed 's/ //g')
-
 	if [ "$analytics_check" == "0" ]; then
 		analytics="No"
 		coverage="N/A"
 	else
 		analytics="Yes"
 		if [ $check_analytics_coverage == 1 ] && [ "$check_html_url" == "${check_html_url/$ignore_domain/}" ]; then
+		
+			# First check to see how many wget spiders are running. This is to keep from running too many spiders and driving up the load average.
+			procs=`ps -ax | grep -i wget | wc -l | sed 's/ //g'`
+			total_procs=`echo $procs-1|bc`
+			
+			while [ $total_procs -gt $concurrent_procs ]
+			# If more then 5 wget's running, sleep for a minute and try again.
+			do
+				echo "Sleeping ($total_procs waiting)...."
+				sleep 60
+				procs=`ps -ax | grep -i wget | wc -l | sed 's/ //g'`
+				total_procs=`echo $procs-1|bc`
+				
+			done
+		
 			#Spider every page on the website to determine the % of pages with analytics
 			echo "Spidering $address..."
 			coverage=`./find-analytics.sh $check_html_url $analytics_string`
@@ -104,6 +136,6 @@ else
 	coverage="N/A"
 fi
 
-#echo "$address, $response, $analytics ($analytics_check)"
+echo "$address, $status_type, $analytics ($analytics_check)"
 status=`echo $status | sed 's/ /\+/g'` 
 echo "$address,$pro,$status,$status_type,$analytics,$coverage" >> $output

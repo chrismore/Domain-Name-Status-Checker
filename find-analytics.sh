@@ -20,8 +20,8 @@ ignore_files=`find ./web/$domain -type f \( -name "*.html" -or -name "*.htm" \) 
 # Subtract the ignored files from files to get a final number.
 files=`echo $files-$ignore_files|bc`
 #echo "found $finds files with string out of $files files"
-if [ $files -ge 2 ]; then
-	# If more then one page is returned, then calculate the percentage
+if [ $files -ge 1 ]; then
+	# If at least one page is found, calculate percentage
 	echo "scale=2; $finds*100/$files" | bc
 else
 	# Return 0 if none or one pages returned total.

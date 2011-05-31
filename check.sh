@@ -6,17 +6,19 @@
 
 inputfile="input.txt"
 outputfile="output.txt"
+websites_output="active-websites.txt"
 
 #####
 
 exec `cat /dev/null > $outputfile`
 exec `rm -rf web > /dev/null`
+exec `cat /dev/null > $websites_output`
 
 input=`cat $inputfile`
 
 for address in $input; do
 
-	sleep .25
+	sleep 2
 	./check-domain.sh $address $outputfile &
 
 done
