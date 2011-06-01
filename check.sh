@@ -10,9 +10,9 @@ websites_output="active-websites.txt"
 
 #####
 
-exec `cat /dev/null > $outputfile`
-exec `rm -rf web > /dev/null`
-exec `cat /dev/null > $websites_output`
+#exec `cat /dev/null > $outputfile`
+#exec `rm -rf web > /dev/null`
+#exec `cat /dev/null > $websites_output`
 
 input=`cat $inputfile`
 

@@ -3,7 +3,7 @@
 address=$1
 output=$2
 
-ignore_domain="allizom"
+ignore_domain="allizom|-cdn|\.stage"
 websites_output="active-websites.txt"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
@@ -100,7 +100,10 @@ if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 		coverage="N/A"
 	else
 		analytics="Yes"
-		if [ $check_analytics_coverage == 1 ] && [ "$check_html_url" == "${check_html_url/$ignore_domain/}" ]; then
+		ignore_domain_check=`echo $check_html_url | grep -i -E $ignore_domain | wc -l | sed 's/ //g'`
+		
+		# Check to see if analytics coverage should be performed, if the domain should be ignored.
+		if [ $check_analytics_coverage == 1 ] && [ $ignore_domain_check == 0 ]; then
 		
 			# First check to see how many wget spiders are running. This is to keep from running too many spiders and driving up the load average.
 			procs=`ps -ax | grep -i wget | wc -l | sed 's/ //g'`
