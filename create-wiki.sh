@@ -88,4 +88,4 @@ echo "|}
 * Total analytics installed: $total_analytics
 * Total robot blocked websites: [[Domain Names/robots-blocked|$total_robots_blocked]]
 
-The source script for this page can be found at [https://github.com/chrismore/Domain-Name-Status-Checker here]." >> $output
+The source script for this page can be found [https://github.com/chrismore/Domain-Name-Status-Checker here]." >> $output

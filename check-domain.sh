@@ -110,7 +110,7 @@ if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 			total_procs=`echo $procs-1|bc`
 			
 			while [ $total_procs -gt $concurrent_procs ]
-			# If more then 5 wget's running, sleep for a minute and try again.
+			# If more then n wget's running, sleep for a minute and try again.
 			do
 				echo "Sleeping ($total_procs waiting)...."
 				sleep 60
