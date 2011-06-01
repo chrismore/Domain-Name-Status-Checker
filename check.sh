@@ -6,13 +6,11 @@
 
 inputfile="input.txt"
 outputfile="output.txt"
-websites_output="active-websites.txt"
 
 #####
 
 exec `cat /dev/null > $outputfile`
-exec `rm -rf web > /dev/null`
-exec `cat /dev/null > $websites_output`
+#exec `rm -rf web > /dev/null`
 
 input=`cat $inputfile`
 

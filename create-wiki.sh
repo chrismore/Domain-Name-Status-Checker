@@ -3,8 +3,10 @@
 inputfile="output.txt"
 output="output-wiki.txt"
 output_robots="output-robots.txt"
+websites_output="active-websites.txt"
 exec `sort -o $inputfile $inputfile`
 exec `cat /dev/null > $output`
+exec `cat /dev/null > $websites_output`
 
 total_websites=0
 total_analytics=0
@@ -13,6 +15,8 @@ total_error=0
 total_redirect=0
 total_ftp=0
 total_robots_blocked=0
+
+curl -s https://wiki.mozilla.org/Webdev:WhoWorksOnWhat > current-websites.txt
 
 today=`date +%m-%d-%Y`
 
@@ -50,8 +54,13 @@ for thisline in $input; do
 		robots=`./check-robots.sh $address`
 		if [ "$robots" == "1" ]; then
 			(( total_robots_blocked++ ))
-			echo "* [[$pro:$address/robots.txt|$address]]" >> $output_robots
+			echo "* [$pro://$address/robots.txt $address]" >> $output_robots
 		fi
+		
+		address_check=`./get-redirected-address.sh $address`
+		echo "Check: $address, $address_check"
+		exec `./active-websites.sh $address_check $websites_output > /dev/null`
+	
 	elif [ "$status_type" == "error" ]; then
 		(( total_error++ ))
 	elif [ "$status_type" == "redirect" ]; then

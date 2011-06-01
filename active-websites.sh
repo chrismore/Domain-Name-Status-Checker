@@ -4,7 +4,7 @@ address=$1
 output=$2
 
 domain=`echo $address | sed -E "s/^(.+\/\/)([^/]+)(.*)/\2/"`
-title=`curl -s $address | grep -i "title>" | sed -E "s/^[^<]+//g" | sed -E "s/<title>//g" | sed -E "s/<\/title>//g"`
+title=`curl -s $address | grep -i "title>" | sed -E "s/^[^<]+//g" | sed -E "s/<title>//g" | sed -E "s/<\/title>//g" | sed -E "s/\n|\t//g"`
 found=`grep -i $domain current-websites.txt | wc -l | sed -E "s/ //g"`
 
 if [ "$found" == "0" ]; then

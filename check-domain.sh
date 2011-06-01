@@ -4,11 +4,9 @@ address=$1
 output=$2
 
 ignore_domain="allizom|-cdn|\.stage"
-websites_output="active-websites.txt"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
-create_active_websites_wiki=1
-concurrent_procs=10
+concurrent_procs=20
 
 #determine if this is a website or ftp server
 
@@ -53,8 +51,8 @@ elif [ $response == "301" ] || [ $response == "302" ]; then
 		# website stayed http
 		domain=`echo $website_redirected | sed -E "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 		if [[ "$domain" == "$address" ]]; then
+		
 			# website redirected, but stayed on the same domain. Probably l10n redirection.
-			
 			website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
 			
 			if [ "$website_redirected2" == "" ]; then
@@ -86,6 +84,13 @@ elif [ $response == "502" ]; then
 	status_type="error"
 else
 	status="Error: $response"
+	status_type="error"
+fi
+
+# Check to make sure if the website was redirected, that it did not redirected to a 404 page.
+response=$(curl --write-out %{http_code} --silent --output /dev/null $check_html_url)
+if [ $response == "404" ]; then
+	status="Error: $response Not Found"
 	status_type="error"
 fi
 
@@ -130,9 +135,7 @@ if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 		fi
 	fi
 	
-	if [ $create_active_websites_wiki == 1 ]; then
-		exec `./active-websites.sh $check_html_url $websites_output > /dev/null`
-	fi
+	
 else
 	analytics="N/A"
 	analytics_check=0

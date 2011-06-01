@@ -10,7 +10,7 @@ domain=`echo $address | sed -E "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 # Remove all spider cache
 # Spider every page, which requires HTTrack + libssl.so installed
 #exec `httrack "$address" -w -T5 -p1 -N3 -Q -%x -I0 -A9999999999 -%c10 -c5 -F "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" > /dev/null`
-exec `wget -D $domain -R *smartproxy*,.ppt,.ics,.gz,.xpi,.pdf,.exe,.rss,.js,.png,.css,.gif,.jpg,.ico,.flv,.dmg,.zip,.txt -r -q -l99999 -nc --connect-timeout=5 -Pweb --no-check-certificate --html-extension -U "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" $address` 
+exec `wget -D $domain -R .swf,.JPG,.PNG,.GIF,.tiff,.bmp,*smartproxy*,.ppt,.ics,.gz,.xpi,.pdf,.exe,.rss,.js,.png,.css,.gif,.jpg,.ico,.flv,.dmg,.zip,.txt -r -q -l 5 -nc --connect-timeout=5 -Pweb --no-check-certificate --html-extension -U "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" $address` 
 # Grep for the number of pages that include the analytics string - stop at first occourance of string in file
 finds=`grep -lri "$analytics_string" ./web/$domain | wc -l | sed 's/ //g'`
 # Find how many HTML pages have been spidered
