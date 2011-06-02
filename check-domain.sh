@@ -87,11 +87,13 @@ else
 	status_type="error"
 fi
 
-# Check to make sure if the website was redirected, that it did not redirected to a 404 page.
-response=$(curl --write-out %{http_code} --silent --output /dev/null $check_html_url)
-if [ $response == "404" ]; then
-	status="Error: $response Not Found"
-	status_type="error"
+if [ "$check_html_url" != "" ]; then
+	# Check to make sure if the website was redirected, that it did not redirected to a 404 page.
+	response=$(curl --write-out %{http_code} --silent --output /dev/null $check_html_url)
+	if [ $response == "404" ]; then
+		status="Error: $response Not Found"
+		status_type="error"
+	fi
 fi
 
 #Check to see if the website has analytics code installed

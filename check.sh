@@ -10,7 +10,7 @@ outputfile="output.txt"
 #####
 
 exec `cat /dev/null > $outputfile`
-#exec `rm -rf web > /dev/null`
+exec `rm -rf web > /dev/null`
 
 input=`cat $inputfile`
 
