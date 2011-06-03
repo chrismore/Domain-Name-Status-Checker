@@ -31,11 +31,11 @@ elif [ $response == "500" ]; then
 	status="Error: $response Internal Server Error"
 elif [ $response == "301" ] || [ $response == "302" ]; then
 	# Check to see if a website is just redirecting from http to https
-	website_redirected=$(curl --write-out %{redirect_url} --silent --output /dev/null $pro://$address)
+	website_redirected=$(curl --write-out %{url_effective} --silent --output /dev/null -L $pro://$address)
 	if [ "https://$address/" == "$website_redirected" ]; then
 		pro="https"
 		# Check redirector again incase it redirects a second time (localization)
-		website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
+		website_redirected2=$(curl --write-out %{url_effective} --silent --output /dev/null -L $website_redirected)
 		if [ "$website_redirected2" == "" ]; then
 			#If the website did not redirect again after switching to https, then set check_html_url to current address.
 			status="Ok"
@@ -49,11 +49,11 @@ elif [ $response == "301" ] || [ $response == "302" ]; then
 		fi
 	else
 		# website stayed http
-		domain=`echo $website_redirected | sed -E "s/^(.+\/\/)([^/]+)(.*)/\2/"`
+		domain=`echo $website_redirected | sed -r 's/^(.+\/\/)([^/]+)(.*)/\2/'`
 		if [[ "$domain" == "$address" ]]; then
 		
 			# website redirected, but stayed on the same domain. Probably l10n redirection.
-			website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
+			website_redirected2=$(curl --write-out %{url_effective} --silent --output /dev/null -L $website_redirected)
 			
 			if [ "$website_redirected2" == "" ]; then
 				# website did not redirect to a subdirectory.
@@ -113,7 +113,7 @@ if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 		if [ $check_analytics_coverage == 1 ] && [ $ignore_domain_check == 0 ]; then
 		
 			# First check to see how many wget spiders are running. This is to keep from running too many spiders and driving up the load average.
-			procs=`ps -ax | grep -i wget | wc -l | sed 's/ //g'`
+			procs=`ps a | grep -i wget | wc -l | sed 's/ //g'`
 			total_procs=`echo $procs-1|bc`
 			
 			while [ $total_procs -gt $concurrent_procs ]
@@ -121,7 +121,7 @@ if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 			do
 				echo "Sleeping ($total_procs waiting)...."
 				sleep 60
-				procs=`ps -ax | grep -i wget | wc -l | sed 's/ //g'`
+				procs=`ps a | grep -i wget | wc -l | sed 's/ //g'`
 				total_procs=`echo $procs-1|bc`
 				
 			done

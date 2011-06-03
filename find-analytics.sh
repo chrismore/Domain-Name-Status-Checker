@@ -6,7 +6,7 @@
 
 address=$1
 analytics_string=$2
-domain=`echo $address | sed -E "s/^(.+\/\/)([^/]+)(.*)/\2/"`
+domain=`echo $address | sed -r "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 # Remove all spider cache
 # Spider every page, which requires HTTrack + libssl.so installed
 #exec `httrack "$address" -w -T5 -p1 -N3 -Q -%x -I0 -A9999999999 -%c10 -c5 -F "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" > /dev/null`
