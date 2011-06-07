@@ -12,7 +12,7 @@ domain=`echo $address | sed -r "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 #exec `httrack "$address" -w -T5 -p1 -N3 -Q -%x -I0 -A9999999999 -%c10 -c5 -F "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" > /dev/null`
 exec `wget -D $domain -R .swf,.JPG,.PNG,.GIF,.tiff,.bmp,*smartproxy*,.ppt,.ics,.gz,.xpi,.pdf,.exe,.rss,.js,.png,.css,.gif,.jpg,.ico,.flv,.dmg,.zip,.txt -r -q -l 5 -nc --connect-timeout=5 -Pweb --no-check-certificate --html-extension -U "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1" $address` 
 # Grep for the number of pages that include the analytics string - stop at first occourance of string in file
-finds=`grep -lri "$analytics_string" ./web/$domain | wc -l | sed 's/ //g'`
+finds=`grep -lri "$analytics_string" ./web/$domain --include=*.html | wc -l | sed 's/ //g'`
 # Find how many HTML pages have been spidered
 files=`find ./web/$domain -type f \( -name "*.html" -or -name "*.htm" \) | wc -l | sed 's/ //g'`
 # There are some files that are mirroed that are behind a proxy, which are not part of the website, but wget still picks them up. The -E 'string' supports regex matching

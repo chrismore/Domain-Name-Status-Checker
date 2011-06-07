@@ -1,12 +1,13 @@
 #!/bin/bash
 
 address=$1
-output=$2
+input=$2
+output=$3
 
 ignore_domain="allizom|-cdn|\.stage"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
-concurrent_procs=20
+concurrent_procs=10
 
 #determine if this is a website or ftp server
 
@@ -147,3 +148,12 @@ fi
 echo "$address, $status_type, $analytics ($analytics_check)"
 status=`echo $status | sed 's/ /\+/g'` 
 echo "$address,$pro,$status,$status_type,$analytics,$coverage" >> $output
+
+## Check to see if all processes are finished to decide to run create-wiki.sh
+
+input_len=`wc -l $input | sed -r 's/^([0-9]+) (.+)/\1/g'`
+output_len=`wc -l $output | sed -r 's/^([0-9]+) (.+)/\1/g'`
+
+if [ "$input_len" == "$output_len" ]; then
+	./create-wiki.sh
+fi

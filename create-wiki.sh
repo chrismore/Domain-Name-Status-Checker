@@ -17,16 +17,16 @@ total_redirect=0
 total_ftp=0
 total_robots_blocked=0
 
-curl -s https://wiki.mozilla.org/Webdev:WhoWorksOnWhat > $input_wiki
+curl -s https://wiki.mozilla.org/Websites/Active_List > $input_wiki
 
 today=`date +%m-%d-%Y`
 
-echo "== Domain List ==
-
-The following is a list of active websites that are blocked from ALL robot spidering:
+echo "The following is a list of active websites that are blocked from ALL robot spidering:
 " > $output_robots
 
-echo "The following list and updates is as of $today.
+echo "== Domain List ==
+
+The following list and updates is as of $today.
 
 	{| class='wikitable sortable' border='1'
 	|-
@@ -57,7 +57,7 @@ for thisline in $input; do
 		robots=`./check-robots.sh $address`
 		if [ "$robots" == "1" ]; then
 			(( total_robots_blocked++ ))
-			echo "* [$pro://$address/robots.txt $address]" >> $output_robots
+			echo "* [$pro://$address $address]" >> $output_robots
 		fi
 		
 		address_check=`./get-redirected-address.sh $address`
@@ -92,17 +92,13 @@ echo "|}
 
 == Statistics ==
 
-* Total websites: [[Domain Names/all|$total_websites]]
+* Total websites: [[Websites/Domain_List//all|$total_websites]]
 * Total FTP servers: $total_ftp
 * Total ok: $total_ok
 * Total errors: $total_error
 * Total redirects: $total_redirect
 * Total analytics installed: $total_analytics
-* Total robot blocked websites: [[Domain Names/robots-blocked|$total_robots_blocked]]
-
-== Ownership ==
-
-* [https://wiki.mozilla.org/Webdev:WhoWorksOnWhat WhoWorksOnWhat]
+* Total robot blocked websites: [[Websites/Domain_List/robots-blocked|$total_robots_blocked]]
 
 == Do you have changes to this list? ==
 
