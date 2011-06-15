@@ -2,11 +2,18 @@
 
 inputfile="output.txt"
 output="output-wiki.txt"
+output_ok="output-ok.txt"
+output_http="output-http.txt"
+output_ftp="output-ftp.txt"
 output_robots="output-robots.txt"
 output_websites="active-websites.txt"
+output_prod="output-prod.txt"
 input_wiki="current-websites.txt"
 exec `sort -o $inputfile $inputfile`
 exec `cat /dev/null > $output`
+exec `cat /dev/null > $output_http`
+exec `cat /dev/null > $output_ftp`
+exec `cat /dev/null > $output_ok`
 exec `cat /dev/null > $output_websites`
 
 total_websites=0
@@ -16,8 +23,11 @@ total_error=0
 total_redirect=0
 total_ftp=0
 total_robots_blocked=0
+total_prod=0
 
 curl -s https://wiki.mozilla.org/Websites/Active_List > $input_wiki
+
+dev_domains="allizom|cdn\-|\-cdn|\.stage|\-stage|stage\-|stage\."
 
 today=`date +%m-%d-%Y`
 
@@ -59,11 +69,19 @@ for thisline in $input; do
 			(( total_robots_blocked++ ))
 			echo "* [$pro://$address $address]" >> $output_robots
 		fi
-		
+
+		ignore_domain_check=`echo $address | grep -i -E $dev_domains | wc -l | sed 's/ //g'`		
+
+		if [ $ignore_domain_check == 0 ]; then
+			(( total_prod++ ))
+			echo "* $address" >> $output_prod
+		fi
+
 		address_check=`./get-redirected-address.sh $address`
 		echo "Check: $address, $address_check"
 		exec `./active-websites.sh $address_check $input_wiki $output_websites > /dev/null`
-	
+		echo "* $address" >> $output_ok
+
 	elif [ "$status_type" == "error" ]; then
 		(( total_error++ ))
 	elif [ "$status_type" == "redirect" ]; then
@@ -72,8 +90,10 @@ for thisline in $input; do
 	
 	if [[ "$pro" == "ftp" ]]; then
 		(( total_ftp++ ))
+		echo "* $address" >> $output_ftp
 	else
 		(( total_websites++ ))
+		echo "* $address" >> $output_http
 	fi
 	
 	if [ "$analytics" == "Yes" ]; then
@@ -92,9 +112,9 @@ echo "|}
 
 == Statistics ==
 
-* Total websites: [[Websites/Domain_List//all|$total_websites]]
-* Total FTP servers: $total_ftp
-* Total ok: $total_ok
+* Total domains: [[Websites/Domain_List/http|$total_websites]]
+* Total ok: [[Websites/Domain_List/ok|$total_ok]]
+* Total prod: [[Websites/Domain_List/prod|$total_prod]]
 * Total errors: $total_error
 * Total redirects: $total_redirect
 * Total analytics installed: $total_analytics

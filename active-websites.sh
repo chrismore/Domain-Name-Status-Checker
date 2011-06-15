@@ -13,18 +13,18 @@ if [ "$found" == "0" ]; then
 
 	if [ "$title" != "Index of " ] && [ "$title" != "" ]; then
 
-echo "== [[Websites/Template|$title]] ==
+echo "== $title ==
 * Prod URL:  $address
-* Stage URL: http://stage.example.com/
-* Code Repo: http://www.code-repository-url.com/
-* L10N Repo: http://www.l10n-repository-url.com/
-* Code: Language / Framework
+* Stage URL:
+* Code Repo:
+* L10N Repo:
+* Code:
 * Licensing:
-* Product Owner: Group; Person
-* Dev Team: Group; Person
-* QA Lead: Person
-* Team Email: team-email@example.com
-* Last reviewed: Person on mm/dd/yyyy
+* Product Owner:
+* Dev Team:
+* QA Lead:
+* Team Email:
+* Last reviewed:
 " >> $output
 
 	fi

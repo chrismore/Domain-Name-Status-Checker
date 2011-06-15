@@ -4,7 +4,8 @@ address=$1
 input=$2
 output=$3
 
-ignore_domain="allizom|-cdn|\.stage"
+# These are the domains that should not be scanned for page analytics due to their size and use of comprehensive templates
+ignore_domain="allizom|\-cdn|\.stage|addons\.mozilla\.org|support\.mozilla\.com|developer\.mozilla\.org|www\.getpersonas\.com|creative\.mozilla\.org|stage\.|\-stage|stage\-|\-cdn"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
 concurrent_procs=10
@@ -33,47 +34,31 @@ elif [ $response == "500" ]; then
 elif [ $response == "301" ] || [ $response == "302" ]; then
 	# Check to see if a website is just redirecting from http to https
 	website_redirected=$(curl --write-out %{url_effective} --silent --output /dev/null -L $pro://$address)
-	if [ "https://$address/" == "$website_redirected" ]; then
-		pro="https"
-		# Check redirector again incase it redirects a second time (localization)
-		website_redirected2=$(curl --write-out %{url_effective} --silent --output /dev/null -L $website_redirected)
-		if [ "$website_redirected2" == "" ]; then
-			#If the website did not redirect again after switching to https, then set check_html_url to current address.
-			status="Ok"
-			status_type="ok"
-			check_html_url=$website_redirected
-		else
-			#If the website redirected a second time, set the check_html_url variable to the second redirected address.
-			status="Ok"
-			status_type="ok"
-			check_html_url=$website_redirected2
+	domain=`echo $website_redirected | sed -r 's/^(.+\/\/)([^/]+)(.*)/\2/'`
+
+	if [[ "$domain" == "$address" ]]; then
+        # website redireted, but stayed on domain.
+	# Check to make sure if the website was redirected, that it did not redirected to a 404 page.
+	response=$(curl --write-out %{http_code} --silent --output /dev/null $website_redirected)
+		if [ $response == "404" ]; then
+	                status="Error: $response Not Found"
+  			status_type="error"
+        	else
+       		 	status="Ok"
+	             	status_type="ok"
+                	check_html_url=$website_redirected
 		fi
+	elif [[ "www.$address" == $domain ]]; then	
+		# Redirected to www	
+		status="Ok"
+          	status_type="ok"
+           	check_html_url=$website_redirected
 	else
-		# website stayed http
-		domain=`echo $website_redirected | sed -r 's/^(.+\/\/)([^/]+)(.*)/\2/'`
-		if [[ "$domain" == "$address" ]]; then
-		
-			# website redirected, but stayed on the same domain. Probably l10n redirection.
-			website_redirected2=$(curl --write-out %{url_effective} --silent --output /dev/null -L $website_redirected)
-			
-			if [ "$website_redirected2" == "" ]; then
-				# website did not redirect to a subdirectory.
-				status="Ok"
-				status_type="ok"
-				check_html_url=$website_redirected
-			else
-				#If the website redirected a second time, set the check_html_url variable to the second redirected address.
-				status="Ok"
-				status_type="ok"
-				check_html_url=$website_redirected2
-			fi
-			
-		else
-			# website redirected to aother domain.
-			status="Redirected: $website_redirected"
-			status_type="redirect"
-		fi		
+		# website redirected to aother domain.
+             	status="Redirected: $website_redirected"
+             	status_type="redirect"
 	fi
+	
 elif [ $response == "000" ]; then
 	status="Error: Unable to connect"
 	status_type="error"
@@ -86,15 +71,6 @@ elif [ $response == "502" ]; then
 else
 	status="Error: $response"
 	status_type="error"
-fi
-
-if [ "$check_html_url" != "" ]; then
-	# Check to make sure if the website was redirected, that it did not redirected to a 404 page.
-	response=$(curl --write-out %{http_code} --silent --output /dev/null $check_html_url)
-	if [ $response == "404" ]; then
-		status="Error: $response Not Found"
-		status_type="error"
-	fi
 fi
 
 #Check to see if the website has analytics code installed
@@ -155,5 +131,7 @@ input_len=`wc -l $input | sed -r 's/^([0-9]+) (.+)/\1/g'`
 output_len=`wc -l $output | sed -r 's/^([0-9]+) (.+)/\1/g'`
 
 if [ "$input_len" == "$output_len" ]; then
+	# Write the already known giant websites temp file back to the output.txt file before creating the wiki.
+	cat output-temp.txt >> output.txt
 	./create-wiki.sh
 fi
