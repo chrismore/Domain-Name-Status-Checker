@@ -6,11 +6,11 @@ address=$1
 # Find redirected address
 
 # Check to see if a website is just redirecting from http to https
-	website_redirected=$(curl --write-out %{redirect_url} --silent --output /dev/null $pro://$address)
+	website_redirected=$(curl --write-out %{url_effective} --silent --output /dev/null -L $pro://$address)
 	if [ "https://$address/" == "$website_redirected" ]; then
 		pro="https"
 		# Check redirector again incase it redirects a second time (localization)
-		website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
+		website_redirected2=$(curl --write-out %{url_effective} --silent --output /dev/null -L $website_redirected)
 		if [ "$website_redirected2" == "" ]; then
 			#If the website did not redirect again after switching to https, then set address_final to current address.
 			address_final=$website_redirected
@@ -22,7 +22,7 @@ address=$1
 		# website stayed http
 		if [[ "$website_redirected" != "" ]]; then
 			# website redirected, but stayed on the same domain. Probably l10n redirection.
-			website_redirected2=$(curl --write-out %{redirect_url} --silent --output /dev/null $website_redirected)
+			website_redirected2=$(curl --write-out %{url_effective} --silent --output /dev/null -L $website_redirected)
 			
 			if [ "$website_redirected2" == "" ]; then
 				# website did not redirect to a subdirectory.
