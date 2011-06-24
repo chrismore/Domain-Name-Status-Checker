@@ -9,7 +9,6 @@ outputfile="output.txt"
 
 #####
 
-exec `sort -o $inputfile $inputfile`
 exec `cat /dev/null > $outputfile`
 exec `rm -rf web > /dev/null`
 
@@ -17,8 +16,8 @@ input=`cat $inputfile`
 
 for address in $input; do
 
-	#sleep 2
-	./check-domain.sh $address $inputfile $outputfile &
+	sleep 2
+	./check-domain.sh $address $outputfile &
 
 done
 
