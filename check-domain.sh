@@ -29,6 +29,7 @@ elif [ $response == "404" ]; then
 	status_type="error"
 elif [ $response == "500" ]; then
 	status="Error: $response Internal Server Error"
+	status_type="error"
 elif [ $response == "301" ] || [ $response == "302" ]; then
 	# Check to see if a website is just redirecting from http to https
 	website_redirected=$(curl --write-out %{redirect_url} --silent --output /dev/null $pro://$address)
