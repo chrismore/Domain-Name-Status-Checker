@@ -9,7 +9,6 @@ outputfile="output.txt"
 
 #####
 
-exec `sort -o $inputfile $inputfile`
 exec `cat /dev/null > $outputfile`
 exec `rm -rf web > /dev/null`
 
