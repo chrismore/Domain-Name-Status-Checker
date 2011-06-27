@@ -16,8 +16,8 @@ input=`cat $inputfile`
 
 for address in $input; do
 
-	#sleep 2
-	./check-domain.sh $address $inputfile $outputfile &
+	sleep 2
+	./check-domain.sh $address $outputfile &
 
 done
 
