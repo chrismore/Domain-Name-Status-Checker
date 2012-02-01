@@ -5,7 +5,7 @@ input=$2
 output=$3
 
 # These are the domains that should not be scanned for page analytics due to their size and use of comprehensive templates
-ignore_domain="allizom|\.stage|addons\.mozilla\.org|support\.mozilla\.com|developer\.mozilla\.org|www\.getpersonas\.com|creative\.mozilla\.org|stage\.|\-stage|stage\-|\-cdn|\-dev"
+ignore_domain="allizom|\.stage|addons\.mozilla\.org|support\.mozilla\.org|www\.getpersonas\.com|creative\.mozilla\.org|stage\.|\-stage|stage\-|\-cdn|\-dev"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
 concurrent_procs=10

@@ -8,11 +8,11 @@ domain=`echo $address | sed -r "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 found=`grep -i $domain $input | wc -l | sed -r "s/ //g"`
 
 if [ "$found" == "0" ]; then
-
+echo "found: $domain"
 	title=`curl -s $address | grep -i "title>" | sed ':a;N;$!ba;s/\n//g' | sed -r "s/^[^<]+//g" | sed -r "s/<(title|TITLE)>//g" | sed -r "s/<\/(title|TITLE)>//g" | sed -r "s/([^<]+)(.*)/\1/g" | sed 's/[^a-z0-9\-\: ]*$//g'`
 
 	if [ "$title" != "Index of " ] && [ "$title" != "" ]; then
-
+echo "code: $domain $title"
 echo "== $title ==
 * Prod URL:  $address
 * Stage URL:

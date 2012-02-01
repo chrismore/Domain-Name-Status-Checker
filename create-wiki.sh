@@ -13,6 +13,7 @@ output_prod="output-prod.txt"
 output_prod_analytics="output-prod-analytics.txt"
 output_owned="output-owned.txt"
 output_not_owned="output-not-owned.txt"
+output_prod_owned="output-prod-owned.txt"
 
 input_wiki="current-websites.txt"
 exec `sort -o $inputfile $inputfile`
@@ -27,6 +28,7 @@ exec `cat /dev/null > $output_prod`
 exec `cat /dev/null > $output_prod_analytics`
 exec `cat /dev/null > $output_owned`
 exec `cat /dev/null > $output_not_owned`
+exec `cat /dev/null > $output_prod_owned`
 
 total_websites=0
 total_analytics=0
@@ -38,6 +40,7 @@ total_robots_blocked=0
 total_prod=0
 total_owned=0
 total_not_owned=0
+total_prod_owned=0
 
 if [ $check_active_websites == 1 ]; then
 	curl -s https://wiki.mozilla.org/Websites/Active_List > $input_wiki
@@ -95,6 +98,10 @@ for thisline in $input; do
 		if [ $ignore_domain_check == 0 ]; then
 			(( total_prod++ ))
 			echo "* $address" >> $output_prod
+			if [ $owned == "Yes" ]; then
+				echo "* $address" >> $output_prod_owned
+				(( total_prod_owned++ ))
+			fi
 		fi
 
 		if [ $check_active_websites == 1 ]; then
