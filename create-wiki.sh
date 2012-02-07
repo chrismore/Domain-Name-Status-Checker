@@ -53,7 +53,9 @@ today=`date +%m-%d-%Y`
 echo "The following is a list of active websites that are blocked from ALL robot spidering:
 " > $output_robots
 
-echo "== Domain List ==
+echo "__TOC__
+
+== Domain List ==
 
 The following list and updates is as of $today.
 
@@ -164,6 +166,7 @@ echo "|}
 * Total prod analytics installed: [[Websites/Domain_List/prod-analytics|$total_analytics]]
 * Total robot blocked websites: [[Websites/Domain_List/robots-blocked|$total_robots_blocked]]
 * Total Mozilla owned: [[Websites/Domain_List/Mozilla_Owned|$total_owned]]
+* Total Mozilla Production owned: [[Websites/Domain_List/Mozilla_Prod_Owned|$total_prod_owned]]
 * Total community owned: [[Websites/Domain_List/Community_Owned|$total_not_owned]]
 
 == Do you have changes to this list? ==

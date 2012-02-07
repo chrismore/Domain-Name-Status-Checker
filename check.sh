@@ -9,6 +9,7 @@ outputfile="output.txt"
 
 #####
 
+exec `./get-input.sh`
 exec `cat /dev/null > $outputfile`
 exec `rm -rf web > /dev/null`
 
