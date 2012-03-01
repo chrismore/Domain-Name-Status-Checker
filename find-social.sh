@@ -21,7 +21,7 @@ for address in $input; do
 	if [ $ignore_domain_check == 0 ]; then
 
 		echo "spidering $address"
-		exec `wget -D $domain -R .swf,.JPG,.PNG,.GIF,.tiff,.bmp,*smartproxy*,.ppt,.ics,.gz,.xpi,.pdf,.exe,.rss,.js,.png,.css,.gif,.jpg,.ico,.flv,.dmg,.zip,.txt -r -q -l 1 -nc --connect-timeout=5 -P$outputdir --no-check-certificate --html-extension -U "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/9.0.1" $address` 
+		exec `wget -D $domain -R .swf,.JPG,.PNG,.GIF,.tiff,.bmp,*smartproxy*,.ppt,.ics,.gz,.xpi,.pdf,.exe,.rss,.js,.png,.css,.gif,.jpg,.ico,.flv,.dmg,.zip,.txt -r -q -l 1 -nc --connect-timeout=5 -P$outputdir --no-check-certificate --html-extension -Q 2m -U "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/9.0.1" $address` 
 		exec `grep -lriE "platform\.twitter\.com|connect\.facebook\.com|twitter\.com/share|facebook\.com/sharer|twitter\.com/intent/tweet" ./$outputdir/$domain --include=*.html >> $outputfile`
 
 		echo "deleting $domain"

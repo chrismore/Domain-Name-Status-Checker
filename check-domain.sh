@@ -5,7 +5,7 @@ input=$2
 output=$3
 
 # These are the domains that should not be scanned for page analytics due to their size and use of comprehensive templates
-ignore_domain="allizom|\.stage|addons\.mozilla\.org|support\.mozilla\.org|www\.getpersonas\.com|creative\.mozilla\.org|developer\.mozilla\.org|stage\.|\-stage|stage\-|\-cdn|\-dev"
+ignore_domain="allizom|\.stage|stage\.|\-stage|stage\-|\-cdn|\-dev|\.dmz\.|\.sjc1\.|\-phx|\-sjc|\.brasstacks\.|\-mirror|pfs2|\-static|\-www|\-nii0|\-origin|\-proxy"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
 concurrent_procs=10
@@ -143,7 +143,5 @@ input_len=`wc -l $input | sed -r 's/^([0-9]+) (.+)/\1/g'`
 output_len=`wc -l $output | sed -r 's/^([0-9]+) (.+)/\1/g'`
 
 if [ "$input_len" == "$output_len" ]; then
-	# Write the already known giant websites temp file back to the output.txt file before creating the wiki.
-	cat output-temp.txt >> output.txt
 	./create-wiki.sh
 fi

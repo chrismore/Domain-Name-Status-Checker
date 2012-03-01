@@ -46,7 +46,7 @@ if [ $check_active_websites == 1 ]; then
 	curl -s https://wiki.mozilla.org/Websites/Active_List > $input_wiki
 fi
 
-dev_domains="allizom|cdn\-|\-cdn|\.stage|\-stage|stage\-|stage\.|\-stage|\-dev"
+dev_domains="allizom|\.stage|stage\.|\-stage|stage\-|\-cdn|\-dev|\.dmz\.|\.sjc1\.|\-phx|\-sjc|\.brasstacks\.|\-mirror|pfs2|\-static|\-www|\-nii0|\-origin|\-proxy"
 
 today=`date +%m-%d-%Y`
 
