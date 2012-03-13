@@ -12,15 +12,22 @@ previousletter="0"
 
 echo "<div>" >> $outputfile
 for address in $input; do
+echo "index: $address"
 
-        letter=`echo $address | cut -c 1 | tr '[:lower:]' '[:upper:]'`
+	check_old=`./check-old.sh $address`
 
-        if [ $letter != $previousletter ]; then
+	if [ "$check_old" == "0" ]; then
 
-                echo "<a href="#$letter">$letter</a> |" >> $outputfile
+	        letter=`echo $address | cut -c 1 | tr '[:lower:]' '[:upper:]'`
 
-                previousletter=$letter
-        fi
+	        if [ $letter != $previousletter ]; then
+
+	                echo "<a href="#$letter">$letter</a> |" >> $outputfile
+
+	                previousletter=$letter
+        	fi
+
+	fi
 
 done
 echo "</div>" >> $outputfile
@@ -30,23 +37,35 @@ previousletter="0"
 echo "<div>" >>	$outputfile
 for address in $input; do
 
-	letter=`echo $address | cut -c 1 | tr '[:lower:]' '[:upper:]'`
+echo "site: $address"
 
-	if [ $letter != $previousletter ]; then
+	check_old=`./check-old.sh $address`
+
+        if [ "$check_old" == "0" ]; then
+
+		letter=`echo $address | cut -c 1 | tr '[:lower:]' '[:upper:]'`
+
+		if [ $letter != $previousletter ]; then
 		
-		if [ $previousletter != "0" ]; then
-			echo "</ul>" >> $outputfile
+			if [ $previousletter != "0" ]; then
+				echo "</ul>" >> $outputfile
+			fi
+
+			echo "<h2 id=\"$letter\">$letter</h2><ul>" >> $outputfile
+
+			previousletter=$letter		
 		fi
 
-		echo "<h2 id=\"$letter\">$letter</h2><ul>" >> $outputfile
+		title=`exec ./get-title.sh $address`
 
-		previousletter=$letter		
-	fi
+		if [ "$title" != "" ]; then
+			echo "<li><a href=\"http://$address\">$address</a> - $title</li>" >> $outputfile
+		fi
 
-	title=`exec ./get-title.sh $address`
+	else
 
-	if [ "$title" != "" ]; then
-		echo "<li><a href=\"http://$address\">$address</a> - $title</li>" >> $outputfile
+		echo "Old: $address"
+
 	fi
 
 done

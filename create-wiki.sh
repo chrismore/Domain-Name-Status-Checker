@@ -14,6 +14,7 @@ output_prod_analytics="output-prod-analytics.txt"
 output_owned="output-owned.txt"
 output_not_owned="output-not-owned.txt"
 output_prod_owned="output-prod-owned.txt"
+output_prod_old="output-prod-old.txt"
 
 input_wiki="current-websites.txt"
 exec `sort -o $inputfile $inputfile`
@@ -29,6 +30,7 @@ exec `cat /dev/null > $output_prod_analytics`
 exec `cat /dev/null > $output_owned`
 exec `cat /dev/null > $output_not_owned`
 exec `cat /dev/null > $output_prod_owned`
+exec `cat /dev/null > $output_prod_old`
 
 total_websites=0
 total_analytics=0
@@ -41,12 +43,11 @@ total_prod=0
 total_owned=0
 total_not_owned=0
 total_prod_owned=0
+total_prod_old=0
 
 if [ $check_active_websites == 1 ]; then
 	curl -s https://wiki.mozilla.org/Websites/Active_List > $input_wiki
 fi
-
-dev_domains="allizom|\.stage|stage\.|\-stage|stage\-|\-cdn|\-dev|\.dmz\.|\.sjc1\.|\-phx|\-sjc|\.brasstacks\.|\-mirror|pfs2|\-static|\-www|\-nii0|\-origin|\-proxy"
 
 today=`date +%m-%d-%Y`
 
@@ -95,7 +96,7 @@ for thisline in $input; do
 			echo "* [$pro://$address $address]" >> $output_robots
 		fi
 
-		ignore_domain_check=`echo $address | grep -i -E $dev_domains | wc -l | sed 's/ //g'`		
+		ignore_domain_check=`./check-ignore.sh $address`		
 
 		if [ $ignore_domain_check == 0 ]; then
 			(( total_prod++ ))
@@ -104,6 +105,14 @@ for thisline in $input; do
 				echo "* $address" >> $output_prod_owned
 				(( total_prod_owned++ ))
 			fi
+
+                	check_old=`./check-old.sh $address`
+
+		        if [ $check_old == "1" ]; then
+                	       (( total_prod_old++ ))
+                        	echo "* $address" >> $output_prod_old
+        		fi
+
 		fi
 
 		if [ $check_active_websites == 1 ]; then
@@ -168,6 +177,7 @@ echo "|}
 * Total Mozilla owned: [[Websites/Domain_List/Mozilla_Owned|$total_owned]]
 * Total Mozilla Production owned: [[Websites/Domain_List/Mozilla_Prod_Owned|$total_prod_owned]]
 * Total community owned: [[Websites/Domain_List/Community_Owned|$total_not_owned]]
+* Total Ok prod old: [[Websites/Domain_List/prod/old|$total_prod_old]]
 
 == Do you have changes to this list? ==
 

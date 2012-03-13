@@ -5,7 +5,6 @@ input=$2
 output=$3
 
 # These are the domains that should not be scanned for page analytics due to their size and use of comprehensive templates
-ignore_domain="allizom|\.stage|stage\.|\-stage|stage\-|\-cdn|\-dev|\.dmz\.|\.sjc1\.|\-phx|\-sjc|\.brasstacks\.|\-mirror|pfs2|\-static|\-www|\-nii0|\-origin|\-proxy"
 analytics_string="webtrendslive.com"
 check_analytics_coverage=1
 concurrent_procs=10
@@ -85,7 +84,7 @@ if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 		coverage="N/A"
 	else
 		analytics="Yes"
-		ignore_domain_check=`echo $check_html_url | grep -i -E $ignore_domain | wc -l | sed 's/ //g'`
+		ignore_domain_check=`./check-ignore.sh $check_html_url`
 		
 		# Check to see if analytics coverage should be performed, if the domain should be ignored.
 		if [ $check_analytics_coverage == 1 ] && [ $ignore_domain_check == 0 ]; then
