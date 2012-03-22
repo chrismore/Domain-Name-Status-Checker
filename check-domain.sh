@@ -18,7 +18,7 @@ if echo "$address" | grep -i '^ftp'; then
        fi
 
 #Check the status code of the address
-response=$(curl --write-out %{http_code} --silent --output /dev/null $pro://$address)        
+response=$(curl -k --write-out %{http_code} --silent --output /dev/null $pro://$address)        
 
 #Determine a human readable status code message
 if [ $response == "200" ] || [ $response == "226" ]; then
@@ -32,14 +32,15 @@ elif [ $response == "500" ]; then
 	status="Error: $response Internal Server Error"
 	status_type="error"
 elif [ $response == "301" ] || [ $response == "302" ]; then
+
 	# Check to see if a website is just redirecting from http to https
-	website_redirected=$(curl --write-out %{url_effective} --silent --output /dev/null -L $pro://$address)
+	website_redirected=$(curl -k --write-out %{url_effective} --silent --output /dev/null -L $pro://$address)
 	domain=`echo $website_redirected | sed -r 's/^(.+\/\/)([^/]+)(.*)/\2/'`
 
 	if [[ "$domain" == "$address" ]]; then
         # website redireted, but stayed on domain.
 	# Check to make sure if the website was redirected, that it did not redirected to a 404 page.
-	response=$(curl --write-out %{http_code} --silent --output /dev/null $website_redirected)
+	response=$(curl -k --write-out %{http_code} --silent --output /dev/null $website_redirected)
 		if [ $response == "404" ]; then
 	                status="Error: $response Not Found"
   			status_type="error"
@@ -142,5 +143,7 @@ input_len=`wc -l $input | sed -r 's/^([0-9]+) (.+)/\1/g'`
 output_len=`wc -l $output | sed -r 's/^([0-9]+) (.+)/\1/g'`
 
 if [ "$input_len" == "$output_len" ]; then
+	echo "Creating wiki"
 	./create-wiki.sh
+	echo "Done."
 fi
