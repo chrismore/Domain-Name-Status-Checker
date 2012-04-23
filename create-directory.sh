@@ -16,7 +16,9 @@ echo "index: $address"
 
 	check_old=`./check-old.sh $address`
 
-	if [ "$check_old" == "0" ]; then
+	title=`exec ./get-title.sh $address`
+
+	if [ "$check_old" == "0" ] && [ "$title" != "" ]; then
 
 	        letter=`echo $address | cut -c 1 | tr '[:lower:]' '[:upper:]'`
 
@@ -58,8 +60,12 @@ echo "site: $address"
 
 		title=`exec ./get-title.sh $address`
 
-		if [ "$title" != "" ]; then
+		check_dup=`grep " - $title<" $outputfile | wc -l | sed 's/ //g'`
+
+		if [ "$title" != "" ] && [ $check_dup == "0" ]; then
 			echo "<li><a href=\"http://$address\">$address</a> - $title</li>" >> $outputfile
+		else
+			echo "Opps! title=$title dup=$check_dup"
 		fi
 
 	else
@@ -70,4 +76,4 @@ echo "site: $address"
 
 done
 echo "</div>" >> $outputfile
-
+echo "done"
