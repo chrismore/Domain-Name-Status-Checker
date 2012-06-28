@@ -2,11 +2,12 @@
 
 address=$1
 days_cutoff=180
+timeout=3
 
-response=$(curl --write-out %{http_code} --silent --output /dev/null http://$address)
+response=$(curl -m $timeout --write-out %{http_code} --silent --output /dev/null http://$address)
 
 if [ $response != "200" ]; then
-        address=$(curl --write-out %{url_effective} --silent --output /dev/null -L http://$address)
+        address=$(curl -m $timeout --write-out %{url_effective} --silent --output /dev/null -L http://$address)
 fi
 
 exec `curl -I --silent $address > temp.txt`

@@ -1,15 +1,16 @@
 #!/bin/bash
 
 address=$1
+timeout=3
 
-response=$(curl -m 10 --write-out %{http_code} --silent --output /dev/null http://$address)
+response=$(curl -m $timeout --write-out %{http_code} --silent --output /dev/null http://$address)
 badtitles="Authorization Required|Index of"
 
 if [ $response != "200" ]; then
-	address=$(curl -m 10 --write-out %{url_effective} --silent --output /dev/null -L http://$address)
+	address=$(curl -m $timeout --write-out %{url_effective} --silent --output /dev/null -L http://$address)
 fi
 
-title=`curl -m 10 -sk $address | sed -n 's/.*<title>\(.*\)<\/title>.*/\1/ip;T;q'`
+title=`curl -m 3 -sk $address | sed -n 's/.*<title>\(.*\)<\/title>.*/\1/ip;T;q'`
 
 if [ "$title" != "" ]; then
 	ignore_address=`echo $title | grep -i -E "$badtitles" | wc -l | sed 's/ //g'`

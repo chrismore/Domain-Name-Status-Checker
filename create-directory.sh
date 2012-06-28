@@ -14,9 +14,12 @@ echo "<div>" >> $outputfile
 for address in $input; do
 echo "index: $address"
 
+	echo "Getting age"
 	check_old=`./check-old.sh $address`
-
+	echo "Got age"
+	echo "Getting title"
 	title=`exec ./get-title.sh $address`
+	echo "Got title"
 
 	if [ "$check_old" == "0" ] && [ "$title" != "" ]; then
 
@@ -41,7 +44,9 @@ for address in $input; do
 
 echo "site: $address"
 
+	echo "Getting age"
 	check_old=`./check-old.sh $address`
+	echo "Got age"
 
         if [ "$check_old" == "0" ]; then
 
@@ -58,7 +63,9 @@ echo "site: $address"
 			previousletter=$letter		
 		fi
 
+		echo "Getting title"
 		title=`exec ./get-title.sh $address`
+		echo "Got title"
 
 		check_dup=`grep " - $title<" $outputfile | wc -l | sed 's/ //g'`
 
@@ -77,3 +84,5 @@ echo "site: $address"
 done
 echo "</div>" >> $outputfile
 echo "done"
+#exec `iconv -t utf-8 -f iso-8859-1 $outputfile -c > output-directory-temp.txt`
+#exec `mv output-directory-temp.txt $outputfile`
