@@ -10,6 +10,8 @@ maxmb="500m"
 taglength="31"
 currentfx="13"
 oldfx="9"
+bedrock_string="doctype html"
+bedrock_responsive="initial-scale"
 
 exec `rm -rf $outputdir/$domain`
 exec `cat /dev/null > $outputtag`
@@ -33,6 +35,11 @@ echo "Finding pages"
 pages=`find ./$outputdir/$domain -name *.html`
 
 for page in $pages; do
+
+    # make sure page does not include query strings
+    check_querystring=`echo $page | grep -i -E '.html\?.+' | wc -l | sed 's/ //g'`
+
+    if [ $check_querystring == 0 ]; then
 
 	echo "checking $page"
 
@@ -64,32 +71,62 @@ for page in $pages; do
 
 	echo "tag lenghts nstag=$nstaglength jstag=$jstaglength"
 
+	# Check websites for platform specific pages
+	if [ $domain == "www.mozilla.org" ]; then
+
+		bedrock_check=`more $page | grep "$bedrock_string" | wc -l | sed 's/ //g'`
+	
+		if [ $bedrock_check == 0 ]; then
+		
+			platform="PHP"
+			echo "PHP page"
+		else
+	
+			echo "check bedrock"
+                        responsive_check=`more $page | grep -i $bedrock_responsive | wc -l | sed 's/ //g'`
+
+			if [ $responsive_check == 0 ]; then
+				echo "bedrock non-responsive"
+                                platform="Bedrock Non-Responsive"
+                        else
+				echo "bedrock responsive"
+                            	platform="Bedrock Responsive"
+                        fi
+
+                fi
+
+	else
+	       platform=""
+	fi
+
 	if [ $nstaglength == 0 ]; then
 
 		notfound=`grep -i "404: Page Not Found" $page | wc -l | sed 's/ //g'`
 
 		if [ $notfound == 1 ]; then
-			echo "$domain,$page,,,404 Not Found" >> $outputtag
+			echo "$domain,$page,,,404 Not Found,$platform" >> $outputtag
                 	echo "404 on page $page"
 		else
-			echo "$domain,$page,,,Missing All Tags" >> $outputtag
+			echo "$domain,$page,,,Missing All Tags,$platform" >> $outputtag
 			echo "No nstag found on page $page"
 		fi
 	else	
 
 		if [ $jstaglength == 0 ]; then
 			#single tag on page
-			echo "$domain,$page,$nstag,,JS Tag Missing" >> $outputtag
+			echo "$domain,$page,$nstag,,JS Tag Missing,$platform" >> $outputtag
 		else
 			#two tags found
 			if [ $nstag == $jstag ]; then
-				echo "$domain,$page,$nstag,$jstag,Same Tags" >> $outputtag
+				echo "$domain,$page,$nstag,$jstag,Same Tags,$platform" >> $outputtag
 			else
-				echo "$domain,$page,$nstag,$jstag,Different Tags" >> $outputtag
+				echo "$domain,$page,$nstag,$jstag,Different Tags,$platform" >> $outputtag
 			fi
 		fi
 
 	fi 
+
+    fi
 
 done
 
