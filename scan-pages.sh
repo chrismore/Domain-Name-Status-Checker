@@ -12,6 +12,7 @@ currentfx="13"
 oldfx="9"
 bedrock_string="doctype html"
 bedrock_responsive="initial-scale"
+mozilla_org_php="/org/favicon.ico"
 
 exec `rm -rf $outputdir/$domain`
 exec `cat /dev/null > $outputtag`
@@ -77,9 +78,15 @@ for page in $pages; do
 		bedrock_check=`more $page | grep "$bedrock_string" | wc -l | sed 's/ //g'`
 	
 		if [ $bedrock_check == 0 ]; then
-		
-			platform="PHP"
-			echo "PHP page"
+
+			echo "PHP"		
+			org_check=`more $page | grep -i "$mozilla_org_php" | wc -l | sed 's/ //g'`
+
+			if [ $org_check == 0 ]; then
+				platform="PHP .com"
+			else
+				platform="PHP .org"
+			fi
 		else
 	
 			echo "check bedrock"
