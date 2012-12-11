@@ -4,7 +4,7 @@ address=$1
 page=$2
 taglength="31"
 
-file=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)src="([^"]+(common\-min\.js|webtrends[^\?\/]*\.js|analytics.js|wt.js)[^"]*)"(.+)$/\2/'`
+file=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)src="([^"]+(common\-min\.js|webtrends[^\?\/]*\.js|analytics.js|wt.js|min.js)[^"]*)"(.+)$/\2/'`
 
 # check to see if it is an fully qualified address or not
 findhttp=`echo $file | grep -i "http" | wc -l | sed 's/ //g'`

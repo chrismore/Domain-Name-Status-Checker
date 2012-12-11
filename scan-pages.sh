@@ -8,7 +8,7 @@ domain=`echo $address | sed -r "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 outputtag="output-tag.txt"
 maxmb="500m"
 taglength="31"
-currentfx="13"
+currentfx="17"
 oldfx="9"
 bedrock_string="doctype html"
 bedrock_responsive="initial-scale"
@@ -44,14 +44,24 @@ for page in $pages; do
 
 	echo "checking $page"
 
-	#tag ending in quote
+	# WT no script tag
 	nstag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(dcs.{22}\_.{4})\/(.+)/\2/g'`
 	
-	#tag ending in slash
+	# js WT tag
 	jstag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(dcs.{22}\_.{4})\"(.+)/\2/g'`
+
+	# find Google Analytics tag
+	gatag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(UA\-[0-9]+\-[0-9]+)(.+)/\2/g'`
 	
 	nstaglength=`echo $nstag | wc -m | sed 's/ //g'`
 	jstaglength=`echo $jstag | wc -m | sed 's/ //g'`
+	gataglength=`echo $gatag | wc -m | sed 's/ //g'`
+
+	if [ "$gataglength" -gt "$taglength" ]; then
+		# no GA tag found
+		gataglength=0
+		gatag=""
+	fi
 
 	if [ "$nstaglength" -gt "$taglength" ]; then
                 #page returned since no	tag found
@@ -67,10 +77,13 @@ for page in $pages; do
 		# Check to see if a tag was found
 		if [ $jstaglength == $taglength ]; then
 			jstag=$jscheck
+		else
+			jstaglength=0
 		fi
+
 	fi
 
-	echo "tag lenghts nstag=$nstaglength jstag=$jstaglength"
+	echo "tag lenghts nstag=$nstaglength jstag=$jstaglength gatag=$gataglength"
 
 	# Check websites for platform specific pages
 	if [ $domain == "www.mozilla.org" ]; then
@@ -103,7 +116,7 @@ for page in $pages; do
                 fi
 
 	else
-	       platform=""
+	       platform="None"
 	fi
 
 	if [ $nstaglength == 0 ]; then
@@ -111,23 +124,23 @@ for page in $pages; do
 		notfound=`grep -i "404: Page Not Found" $page | wc -l | sed 's/ //g'`
 
 		if [ $notfound == 1 ]; then
-			echo "$domain,$page,,,404 Not Found,$platform" >> $outputtag
+			echo "$domain,$page,,,404 Not Found,$gatag,$platform" >> $outputtag
                 	echo "404 on page $page"
 		else
-			echo "$domain,$page,,,Missing All Tags,$platform" >> $outputtag
+			echo "$domain,$page,,,Missing WT All Tags,$gatag,$platform" >> $outputtag
 			echo "No nstag found on page $page"
 		fi
 	else	
 
 		if [ $jstaglength == 0 ]; then
 			#single tag on page
-			echo "$domain,$page,$nstag,,JS Tag Missing,$platform" >> $outputtag
+			echo "$domain,$page,$nstag,,WT JS Tag Missing,$gatag,$platform" >> $outputtag
 		else
 			#two tags found
-			if [ $nstag == $jstag ]; then
-				echo "$domain,$page,$nstag,$jstag,Same Tags,$platform" >> $outputtag
+			if [ "$nstag" == "$jstag" ]; then
+				echo "$domain,$page,$nstag,$jstag,Same WT Tags,$gatag,$platform" >> $outputtag
 			else
-				echo "$domain,$page,$nstag,$jstag,Different Tags,$platform" >> $outputtag
+				echo "$domain,$page,$nstag,$jstag,Different WT Tags,$gatag,$platform" >> $outputtag
 			fi
 		fi
 

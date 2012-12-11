@@ -44,11 +44,15 @@ elif [ $response == "301" ] || [ $response == "302" ]; then
 		if [ $response == "404" ]; then
 	                status="Error: $response Not Found"
   			status_type="error"
-        	else
+        	elif [ $response == "200" ]; then
        		 	status="Ok"
 	             	status_type="ok"
                 	check_html_url=$website_redirected
+		else
+			status="Error: cannot connect"
+			status_type="error"
 		fi
+
 	elif [[ "www.$address" == $domain ]]; then	
 		# Redirected to www	
 		status="Ok"

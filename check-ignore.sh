@@ -2,7 +2,7 @@
 
 domain=$1
 
-ignore_domains="media\.mozilla\.com|\.start([0-9])*\.|mail\.mozillaes\.net|blog\.lizardwrangler\.com|^sjc\.|^s3\.|allizom|\.stage|stage\.|-stage|stage-|-cdn|-dev|\.dmz\.|sjc1\.|-phx\.|-sjc|\.brasstacks\.|-mirror|pfs2|-static|-www|-nii0|-origin|-proxy|^dm-|-mpt\.|^dev\.|mozilla\.net$|ecmascript\.org$|opentimetable\.jp$|-new\.|^m\.|-test\.|people\.mozilla\.com|people\.mozilla\.org|hg_trunk|outgoing\.mozilla\.org|hg\.frenchmozilla\.fr|^ns[0-3]\.|^arecibo\.|^graphite\.|events\.mozilla\-europe\.org|mana\.mozilla\.org|mozillaparty\-archive\.|fortunes\.frenchmozilla\.org"
+ignore_domains="media\.mozilla\.com|\.start([0-9])*\.|mail\.mozillaes\.net|blog\.lizardwrangler\.com|^sjc\.|^s3\.|allizom|\.stage|stage\.|-stage|stage-|-cdn|-dev|\.dmz\.|sjc1\.|-phx\.|-sjc|\.brasstacks\.|-mirror|pfs2|-static|-www|-nii0|-origin|-proxy|^dm-|-mpt\.|^dev\.|mozilla\.net$|ecmascript\.org$|opentimetable\.jp$|-new\.|^m\.|-test\.|people\.mozilla\.com|people\.mozilla\.org|hg_trunk|outgoing\.mozilla\.org|hg\.frenchmozilla\.fr|^ns[0-3]\.|^arecibo\.|^graphite\.|events\.mozilla\-europe\.org|mana\.mozilla\.org|mozillaparty\-archive\.|fortunes\.frenchmozilla\.org|brasstacks\.mozilla\.com|mozilla\-hr\.org|mozilla\.mk|mozilla\-europe\.org|getthunderbird\.jp|caminobrowser\.jp"
 allow_domains="viewvc\.svn"
 
 ignore_domain_check=`echo $domain | grep -i -E $ignore_domains | wc -l | sed 's/ //g'`
