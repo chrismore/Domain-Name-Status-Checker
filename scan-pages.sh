@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## This script will spider a website and download all HTML pages and then determine what webtrend tags are embedded
+## This script will spider a website and download all HTML pages and then determine what analytics tags are embedded
 
 outputdir="web"
 address=$1
@@ -45,13 +45,13 @@ for page in $pages; do
 	echo "checking $page"
 
 	# WT no script tag
-	nstag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(dcs.{22}\_.{4})\/(.+)/\2/g'`
+	nstag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(UA\-\d{4-9}\-\d{1-4})\/(.+)/\2/g'`
 	
 	# js WT tag
-	jstag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(dcs.{22}\_.{4})\"(.+)/\2/g'`
+	jstag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(UA\-{4-9}\-\d{1-4})\"(.+)/\2/g'`
 
 	# find Google Analytics tag
-	gatag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(UA\-[0-9]+\-[0-9]+)(.+)/\2/g'`
+	gatag=`more $page | sed ':a;N;$!ba;s/\n/ /g' | sed 's/ //g' | sed -r 's/^(.+)(UA\-\d{4-9}\-\d{1-4})(.+)/\2/g'`
 	
 	nstaglength=`echo $nstag | wc -m | sed 's/ //g'`
 	jstaglength=`echo $jstag | wc -m | sed 's/ //g'`
@@ -71,7 +71,7 @@ for page in $pages; do
 	if [ "$jstaglength" -gt "$taglength" ]; then
 	
 		# JS tag not found in HTML, check to see if there is an embedded JS file.
-		jscheck=`./get-webtrends-tag.sh $address $page`
+		jscheck=`./get-analytics-tag.sh $address $page`
 		jstaglength=`echo $jscheck | wc -m | sed 's/ //g'`
 
 		# Check to see if a tag was found

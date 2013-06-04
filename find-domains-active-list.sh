@@ -1,5 +1,7 @@
 #!/bin/bash
 
+timeout=5
+
 curl -s https://wiki.mozilla.org/Websites/Active_List > active_list.txt
 
 input=`more active_list.txt | sed 's/ /\+/g'`
@@ -18,11 +20,11 @@ for line in $input; do
 		if [ "$address" != "" ] && [ "$address" != "<ul><li>Prod" ]; then
 			domain=`echo $address | sed -r "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 
-			response=$(curl --write-out %{http_code} --silent --output /dev/null $address)        
+			response=$(curl -m $timeout --write-out %{http_code} --silent --output /dev/null $address)        
 			if [ $response == "200" ] || [ $response == "226" ]; then
 				status_type="ok"
 			elif [ $response == "301" ] || [ $response == "302" ]; then
-				address_redirected=$(curl --write-out %{url_effective} --silent --output /dev/null -L $address)
+				address_redirected=$(curl -m $timeout --write-out %{url_effective} --silent --output /dev/null -L $address)
 				domain_redirected=`echo $address_redirected | sed -r "s/^(.+\/\/)([^/]+)(.*)/\2/"`
 				if [ $domain == $domain_redirected ] || [ $domain_redirected == "www.$domain" ]; then
 					status_type="ok"
@@ -30,7 +32,7 @@ for line in $input; do
 		             		status_type="redirect"
 				fi
 			elif [ $response == "000" ]; then
-				response=$(curl --write-out %{http_code} --silent --output /dev/null www.$domain)
+				response=$(curl -m $timeout --write-out %{http_code} --silent --output /dev/null www.$domain)
 				if [ $response == "200" ]; then
 					status_type="ok"
 				else

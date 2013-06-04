@@ -2,7 +2,7 @@
 
 address=$1
 days_cutoff=180
-timeout=3
+timeout=5
 
 response=$(curl -m $timeout --write-out %{http_code} --silent --output /dev/null http://$address)
 
@@ -10,7 +10,7 @@ if [ $response != "200" ]; then
         address=$(curl -m $timeout --write-out %{url_effective} --silent --output /dev/null -L http://$address)
 fi
 
-exec `curl -I --silent $address > temp.txt`
+exec `curl -m $timeout -I --silent $address > temp.txt`
 
 modified_date=`grep -E "^Last-Modified:" temp.txt | sed -r 's/^(Last-Modified): (.*)/\2/g'`
 date=`grep -E "^Date:" temp.txt | sed -r 's/^(Date): (.*)/\2/g'`

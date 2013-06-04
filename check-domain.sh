@@ -3,10 +3,11 @@
 address=$1
 input=$2
 output=$3
+timeout=5
 
 # These are the domains that should not be scanned for page analytics due to their size and use of comprehensive templates
-analytics_string="webtrendslive.com"
-check_analytics_coverage=1
+analytics_string="google-analytics.com"
+check_analytics_coverage=0
 concurrent_procs=10
 
 #determine if this is a website or ftp server
@@ -18,7 +19,7 @@ if echo "$address" | grep -i '^ftp'; then
        fi
 
 #Check the status code of the address
-response=$(curl -k --write-out %{http_code} --silent --output /dev/null $pro://$address)        
+response=$(curl -m $timeout -k --write-out %{http_code} --silent --output /dev/null $pro://$address)        
 
 #Determine a human readable status code message
 if [ $response == "200" ] || [ $response == "226" ]; then
@@ -34,13 +35,13 @@ elif [ $response == "500" ]; then
 elif [ $response == "301" ] || [ $response == "302" ]; then
 
 	# Check to see if a website is just redirecting from http to https
-	website_redirected=$(curl -k --write-out %{url_effective} --silent --output /dev/null -L $pro://$address)
+	website_redirected=$(curl -m $timeout -k --write-out %{url_effective} --silent --output /dev/null -L $pro://$address)
 	domain=`echo $website_redirected | sed -r 's/^(.+\/\/)([^/]+)(.*)/\2/'`
 
 	if [[ "$domain" == "$address" ]]; then
         # website redireted, but stayed on domain.
 	# Check to make sure if the website was redirected, that it did not redirected to a 404 page.
-	response=$(curl -k --write-out %{http_code} --silent --output /dev/null $website_redirected)
+	response=$(curl -m $timeout -k --write-out %{http_code} --silent --output /dev/null $website_redirected)
 		if [ $response == "404" ]; then
 	                status="Error: $response Not Found"
   			status_type="error"
@@ -83,7 +84,7 @@ fi
 if [ "$status" == "Ok" ] && [ "$pro" != "ftp" ]; then
 
 	#Only check if the website is not redirecting or erroring out
-	analytics_check=$(curl --silent $check_html_url | grep -i $analytics_string | wc -m | sed 's/ //g')
+	analytics_check=$(curl -m $timeout --silent $check_html_url | grep -i $analytics_string | wc -m | sed 's/ //g')
 	if [ "$analytics_check" == "0" ]; then
 		analytics="No"
 		coverage="N/A"
